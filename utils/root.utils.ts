@@ -111,3 +111,56 @@ export const groupFieldConfigs = (fields: _ICommonFieldProps[]) => {
     return groups;
   }, {} as Record<string, _ICommonFieldProps[]>);
 };
+
+
+export function formatKey(key: string) {
+  return key
+    .split("_") // Split the string by underscores
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+    .join(" "); // Join the words with a space
+}
+
+export const getRelativeTime = (date1: string, date2: string) => {
+   if (date1.toLowerCase().trim() === date2.toLowerCase().trim()) {
+     return undefined;
+   }
+  const newDate = new Date();
+  const targetDate = new Date(date2);
+
+  // Calculate the difference in milliseconds
+  const diffInMs = newDate.getTime() - targetDate.getTime();
+
+  // Convert differences to days, months, and years
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24)); // Convert ms to days
+  const diffInMonths = Math.floor(diffInDays / 30); // Approximate months
+  const diffInYears = Math.floor(diffInMonths / 12); // Approximate years
+
+  if (diffInYears >= 1) {
+    return diffInYears === 1
+      ? `last year`
+      : `${diffInYears} years ago`;
+  } else if (diffInMonths >= 3) {
+    return `${diffInMonths} months ago`;
+  } else {
+    return diffInDays === 0
+      ? `today`
+      : diffInDays === 1
+      ? "yesterday"
+      : `${diffInDays} days ago`;
+  }
+};
+
+export const extractImagesFromData = (data: Record<string, any>): string[] => {
+  for (const key in data) {
+    if (data.hasOwnProperty(key) && key.toLowerCase().includes("image")) {
+      const value = data[key];
+      if (typeof value === "string") {
+        return [value];
+      }
+      if (Array.isArray(value)) {
+        return value;
+      }
+    }
+  }
+  return [];
+};

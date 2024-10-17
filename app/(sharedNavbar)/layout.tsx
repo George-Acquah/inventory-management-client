@@ -1,4 +1,4 @@
-import LoginBtn from "@/components/navigation/loginBtn";
+import { auth } from "@/auth";
 import { Typography } from "@/components/ui/typography";
 import { cn } from "@/utils/classes.utils";
 import { THEME } from "@/utils/constants";
@@ -19,7 +19,9 @@ const NavbarDropdowns = dynamic(
   }
 );
 
-export default function DashboardLayout({ children }: _IChildren) {
+export default async function SharedNavbarLayout({ children }: _IChildren) {
+  const session = await auth();
+  const user = session?.user;
   return (
     <div
       className={cn(
@@ -35,13 +37,11 @@ export default function DashboardLayout({ children }: _IChildren) {
           className={`p-2 md:px-10 rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 ${THEME.mainBg} min-h-screen flex flex-col gap-2`}
         >
           <div className="md:mb-4 flex flex-row justify-between items-center">
-
-            <LoginBtn />
             <Search entityType="QUERY" />
             <NavbarDropdowns
               user={{
-                name: "George Acquah",
-                email: "georgeacquah889@gmail.com",
+                name: user?.name!,
+                email: user?.email!,
               }}
             />
           </div>

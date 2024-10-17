@@ -11,22 +11,27 @@ import {
 import { Input } from "../ui/input";
 import { UseFormReturn, FieldValues } from "react-hook-form"; // Import necessary types
 import { useFormState } from "react-dom"; // Server action hook
-import { groupFieldConfigs } from "@/utils/root.utils";
+import { extractImagesFromData, groupFieldConfigs } from "@/utils/root.utils";
 import { Typography } from "../ui/typography";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { cn } from "@/utils/classes.utils";
+import { FileUpload } from "../fileUpload";
+import { useModal } from "@/utils/contexts/modal.context";
 
 interface DynamicFormProps<T extends FieldValues, R> {
   fields: _ICommonFieldProps[]; // Define the fields as an array of common field props
-  action: (
-    prevState: _TActionResult<R>,
-    formData: FormData
-  ) => Promise<_TActionResult<R>>; // Generic form action type
+  action: any;
   form: UseFormReturn<T>; // UseForm return type inferred for the form schema (T)
   actionType?: "create" | "update"; // Type of action ("add" or "update")
   formType?: "single" | "grouped"; // Default to 'single'
   pendingText?: string;
   label?: string;
   data?: Record<string, any>;
+  className?: string;
+  includeFiles?: boolean;
+  id?: string;
+  isModal?: boolean;
+  entity?: string;
 }
 
 // The generic T represents form schema, and R represents action result data type
@@ -39,21 +44,45 @@ export const DynamicForm = <T extends FieldValues, R>({
   pendingText = "Submitting",
   label = "Submit",
   data,
+  className,
+  includeFiles,
+  id,
+  isModal,
+  entity
 }: DynamicFormProps<T, R>) => {
   const initialState: _TActionResult<R> = {
     type: undefined,
     message: null,
   };
 
-  const [state, formAction] = useFormState<_TActionResult<R>, FormData>(
-    action,
+  const resolvedAction =
+    actionType === "update" && id ? action.bind(null, id) : action;
+  const [state, formAction] = useFormState(
+    resolvedAction,
     initialState
+  ) as unknown as any;
+
+  const { setOpen } = useModal();
+
+  const imageUrls = data ? extractImagesFromData(data) : [];
+  
+  const [files, setFiles] = includeFiles
+    ? useState<File[]>([])
+    : [[], () => {}];
+
+  const handleFileUpload = useCallback(
+    (newFiles: File[]) => {
+      if (includeFiles) {
+        setFiles(newFiles);
+      }
+    },
+    [includeFiles]
   );
 
+  const [showSuccess, setShowSuccess] = useState(false);
   const groupedFieldConfigs = groupFieldConfigs(fields);
   const groupData = data ?? {};
 
-  // Handle form submission
   const onSubmit = useCallback(
     async (formData: T) => {
       const formDataObject = new FormData();
@@ -62,10 +91,31 @@ export const DynamicForm = <T extends FieldValues, R>({
           formDataObject.append(key, value as string); // Safe casting
         }
       });
-      await formAction(formDataObject); // Server-side form action
+      
+       if (includeFiles) {
+         files.forEach((file) => {
+           console.log('FILE TO SUBMIT: ', file);
+           formDataObject.append("files", file);
+         });
+       }
+
+      await formAction(formDataObject);
     },
-    [formAction]
+    [formAction, files, includeFiles, entity, actionType]
   );
+
+  useEffect(() => {
+    if (state?.type === "success") {
+      setShowSuccess(true);
+      const timer = setTimeout(() => {
+        setShowSuccess(false);
+        if (isModal && entity) {
+          setOpen(`${entity}-${actionType}`, false);
+        }
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
 
   // Function to render single fields
   const renderSingleFields = useCallback(
@@ -83,6 +133,9 @@ export const DynamicForm = <T extends FieldValues, R>({
                     {...formField}
                     type={field.type}
                     placeholder={field.placeholder}
+                    options={
+                      field.type === "select" ? field.options : undefined
+                    }
                     className="form-input"
                   />
                 </FormControl>
@@ -97,7 +150,7 @@ export const DynamicForm = <T extends FieldValues, R>({
         ))}
       </>
     ),
-    [] // Stable dependency
+    []
   );
 
   // Function to render grouped fields
@@ -109,7 +162,7 @@ export const DynamicForm = <T extends FieldValues, R>({
             <Typography variant="h3" className="mb-4">
               {title}
             </Typography>
-            <div className="lg:grid lg:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-4">
               {renderSingleFields(fields)}
             </div>
           </React.Fragment>
@@ -123,15 +176,25 @@ export const DynamicForm = <T extends FieldValues, R>({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full max-w-md mx-auto py-2"
+        className="w-full max-w-xl mx-auto py-2"
       >
+        {showSuccess && state?.type === "success" && (
+          <FormSuccess message={state?.message!} />
+        )}
         {formType === "single"
           ? renderSingleFields(fields)
           : renderGroupedFields()}
-        {/* Display success message */}
-        {state?.type === "success" && <FormSuccess message={state.message} />}
-        {/* Submit button */}
-        <FormButton text={pendingText} label={label} />
+
+        {includeFiles && (
+          <div className="w-full max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
+            <FileUpload onChange={handleFileUpload} initialUrls={imageUrls} />
+          </div>
+        )}
+        <FormButton
+          text={pendingText}
+          label={label}
+          className={cn("", className)}
+        />
       </form>
     </Form>
   );

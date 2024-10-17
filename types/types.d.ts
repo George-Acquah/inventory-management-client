@@ -8,7 +8,7 @@ interface _ISidebarContextProps {
 interface _IPageId {
   params: {
     id: string;
- }
+  };
 }
 
 interface _IModalContextProps {
@@ -16,7 +16,7 @@ interface _IModalContextProps {
   setOpen: (key: string, open: boolean) => void;
 }
 
-interface _ISidebarProviderProps extends Partial<_ISidebarContextProps>{
+interface _ISidebarProviderProps extends Partial<_ISidebarContextProps> {
   children: React.ReactNode;
 }
 
@@ -24,6 +24,7 @@ interface _ILinks {
   label: string;
   href: string;
   icon: React.JSX.Element | React.ReactNode;
+  parent?: string;
 }
 
 interface _IEntityData {
@@ -55,6 +56,10 @@ interface _ICommonFieldProps {
   name: string;
   label: string;
   type: _TFieldType;
+  options?: {
+    value: string | number;
+    label: string;
+  }[];
   placeholder?: string;
   group?: string; //
   disabled?: boolean;
@@ -65,25 +70,23 @@ interface _ICommonFieldProps {
 interface _IActionBtn {
   id: string;
   label: string;
-  action: (id: string, path: string) => Promise<_IApiResponse<void> | undefined | void>;
+  action: (
+    id: string
+  ) => Promise<_IApiResponse<void> | undefined | void>;
   path?: string;
 }
 
 interface _ITableSignature {
-  [key: string]: string | string[] | number | boolean | null | undefined; // Flexible for other dynamic fields
+  [key: string]: string | string[] | number | boolean |ITEM_SEX_TYPE | ITEM_ZONE | null | undefined; // Flexible for other dynamic fields
 }
-interface _TableRowType extends _ITableSignature{
+interface _TableRowType extends _ITableSignature {
   _id: string; // Explicitly required
   image?: string; // Required for rendering the image
   description?: string;
 }
 
-interface _ITableBase<T= _TEntityType> {
+interface _ITableBase<T = _TEntityType> {
   entityType: T;
-  // deleteAction: (
-  //   id: string,
-  //   path: string
-  // ) => Promise<_IApiResponse<void> | undefined | void>;
 }
 
 interface _ITableProps<T = _TableRowType[]> extends _ITableBase {
@@ -92,8 +95,7 @@ interface _ITableProps<T = _TableRowType[]> extends _ITableBase {
   columnData: string[];
   data?: T;
   deleteAction: (
-    id: string,
-    path: string
+    id: string
   ) => Promise<_IApiResponse<void> | undefined | void>;
 }
 
@@ -102,7 +104,6 @@ interface _ISpecificTableProps {
   currentPage: number;
   pageSize: number;
 }
-
 
 interface _ITooltipItem {
   id: number;
@@ -142,24 +143,70 @@ interface _ISearchQuery {
   };
 }
 
+interface _IItem {
+  [key: string]:
+    | string
+    | string[]
+    | number
+    | ITEM_SEX_TYPE
+    | ITEM_ZONE
+    | undefined;
+  _id: string;
+  itemName: string;
+  itemImage?: string[];
+  price: number;
+  lastPrice: number;
+  addedByName: string;
+  zone: ITEM_ZONE;
+  sexType: ITEM_SEX_TYPE;
+  stock: number;
+  addedById: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-type _TVariants =
-  | "default"
-  | "secondary"
-  | "destructive"
-  | "outline";
+interface _IBasketContextType {
+  state: State;
+  addToBasket: (value: _IItem) => void;
+  clearBasket: () => void;
+  getItemsBasket: () => void;
+  getABasketItem: (value: string) => void;
+  removeFromBasket: (value: string) => void;
+}
 
-type _TSizes =
-  | "default"
-  | "lg"
-  | "sm"
-  | "icon";
-type _TFieldType = "text" | "email" | "password" | "number";
+interface State {
+  items: _IBasketItem[];
+  loading: boolean;
+  message: string | null;
+  totalPrice: number;
+}
 
-  type _TRefDivElement = React.HTMLAttributes<HTMLDivElement>;
+interface _ISellItem {
+  itemId: string;
+  itemName: string;
+  soldPrice: number;
+  quantity: number;
+}
+
+interface _ISellPayload {
+  items: _ISellItem[];
+  totalPrice: number;
+}
+
+interface _IBasketItem extends _ISellItem {
+  itemImage: string;
+}
+
+type _TVariants = "default" | "secondary" | "destructive" | "outline";
+
+type _TSizes = "default" | "lg" | "sm" | "icon";
+type _TFieldType = "text" | "email" | "password" | "number" | "radio" | "select";
+
+type _TRefDivElement = React.HTMLAttributes<HTMLDivElement>;
+type _TRefImageElement = React.HTMLAttributes<HTMLImageElement>;
 type _TRefPElement = React.HTMLAttributes<HTMLParagraphElement>;
 
-
+type _TRequestMethod = "GET" | "POST" | "PATCH" | "DELETE" | "PUT";
 type _TActionResult<T = unknown> =
   | {
       type: "success";
@@ -172,21 +219,32 @@ type _TActionResult<T = unknown> =
     }
   | { type: undefined; message: null };
 
-  type _TEntityType =
-    | "teacher"
-    | "student"
-    | "project"
-    | "task"
-    | "team"
-    | "parent"
-    | "subject"
-    | "class"
-    | "lesson"
-    | "exam"
-    | "assignment"
-    | "result"
-    | "attendance"
-    | "event"
-    | "announcement";
+type _TEntityType =
+  | "teacher"
+  | "student"
+  | "project"
+  | "task"
+  | "team"
+  | "item";
 
-  
+  type Action =
+    | { type: "ADD_TO_BASKET"; value: _IItem }
+    | { type: "REMOVE_FROM_BASKET"; value: string }
+    | { type: "GET_ITEMS_BASKET" }
+    | { type: "GET_TOTAL_PRICE" }
+    | { type: "GET_A_BASKET_ITEM"; value: string }
+    | { type: "CLEAR_BASKET";}
+    | { type: "SET_LOADING"; value: boolean }
+    | { type: "SET_BASKET_MESSAGE"; value: string | null };
+
+enum ITEM_ZONE {
+  ZONE_1 = "zone 1",
+  ZONE_2 = "zone 2",
+  ZONE_3 = "zone 3",
+}
+
+enum ITEM_SEX_TYPE {
+  UNISEX = "unisex",
+  BISEX = "bisex",
+}
+

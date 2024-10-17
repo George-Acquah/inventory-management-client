@@ -1,7 +1,8 @@
+'use client'
+
 import { cn } from "@/utils/classes.utils";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"; // for the outline version
 import {
-  setOpenSidenav,
   useConfigurator,
 } from "@/utils/contexts/configurator.context";
 
@@ -11,7 +12,7 @@ export const MobileSidebar = ({
   ...props
 }: React.ComponentProps<"div">) => {
   const {
-    dispatch,
+    setOpenSidenav,
     state: { openSidenav },
   } = useConfigurator();
 
@@ -26,7 +27,7 @@ export const MobileSidebar = ({
         <div className="flex justify-end z-20 w-full">
           <Bars3Icon
             className="text-neutral-800 dark:text-neutral-200 w-4 h-4"
-            onClick={() => setOpenSidenav(dispatch, !openSidenav)}
+            onClick={() => setOpenSidenav(!openSidenav)}
           />
         </div>
         {openSidenav && (
@@ -40,7 +41,7 @@ export const MobileSidebar = ({
             <div className="absolute right-10 top-10 z-50">
               <XMarkIcon
                 className="text-neutral-800 dark:text-neutral-200 w-4 h-4"
-                onClick={() => setOpenSidenav(dispatch, !openSidenav)}
+                onClick={() => setOpenSidenav(!openSidenav)}
               />
             </div>
             {children}
@@ -57,7 +58,7 @@ export const DesktopSidebar = ({
   ...props
 }: React.ComponentProps<"div">) => {
   const {
-    dispatch,
+    setOpenSidenav,
     state: { openSidenav, animateSidenav },
   } = useConfigurator();
 
@@ -69,10 +70,10 @@ export const DesktopSidebar = ({
         openSidenav ? "w-60" : "w-15" // Adjust width based on openSidenav state
       )}
       onMouseEnter={
-        animateSidenav ? () => setOpenSidenav(dispatch, true) : undefined
+        animateSidenav ? () => setOpenSidenav(true) : undefined
       }
       onMouseLeave={
-        animateSidenav ? () => setOpenSidenav(dispatch, false) : undefined
+        animateSidenav ? () => setOpenSidenav(false) : undefined
       }
       {...props}
     >

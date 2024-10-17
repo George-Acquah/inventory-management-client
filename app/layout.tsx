@@ -26,8 +26,14 @@ export const metadata: Metadata = {
 };
 
 const Configurator = dynamic(() => import("@/components/configurator"), {
-  loading: () => <p>loading ...</p>
+  loading: () => <p>loading ...</p>,
+  ssr: false
 });
+
+const ErrorModal = dynamic(() => import("@/components/errorModal"), {
+  loading: () => <></>,
+  ssr: false
+})
 
 type _TRootLayoutProps = {
   children: ReactNode;
@@ -48,6 +54,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <ErrorModal />
           {children}
           {modal}
           <ConfigurationButton />

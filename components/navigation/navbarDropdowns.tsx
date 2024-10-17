@@ -2,6 +2,7 @@
 import {
   AdjustmentsHorizontalIcon,
   BellAlertIcon,
+  PowerIcon,
 } from "@heroicons/react/24/outline";
 import { Typography } from "../ui/typography";
 import {
@@ -17,26 +18,30 @@ import Avatar from "../ui/avatar";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import useIsMobile from "@/utils/hooks/useMobileView";
+import { signOutHelper } from "@/lib/actions";
 
-const NavbarDropdowns = ({ user }: { user: any }) => {
+const NavbarDropdowns = ({ user }: {
+  user?: {
+    email?: string;
+    name?: string;
+} }) => {
   const notificationsCount = 5;
-  const digitCount = notificationsCount.toString().length; // Get the number of digits
-  // const dropDownSubMenuRef = useRef<HTMLDivElement>(null);
+  const digitCount = notificationsCount.toString().length;
   const router = useRouter();
-  const isMobile = useIsMobile(); // Check if the screen size is mobile
+  const isMobile = useIsMobile();
   const notificationStyles = getDropdownStyles(
-    "-10rem", // mobile left
-    "100%", // mobile top
-    "-8rem", // desktop left
-    "100%", // desktop top
-    isMobile // isMobile boolean
+    "-10rem",
+    "100%",
+    "-8rem",
+    "100%",
+    isMobile
   );
   const profileStyles = getDropdownStyles(
-    "-12rem", // mobile left
-    "100%", // mobile top
-    "-10.5rem", // desktop left
-    "100%", // desktop top
-    isMobile // isMobile boolean
+    "-12rem",
+    "100%",
+    "-10.5rem",
+    "100%",
+    isMobile
   );
 
   return (
@@ -119,13 +124,13 @@ const NavbarDropdowns = ({ user }: { user: any }) => {
         {(onClose) => (
           <DropdownMenuContent>
             <DropdownMenuLabel className="">
-              <Typography variant="h5">{user.name}</Typography>
+              <Typography variant="h5">{user?.name}</Typography>
               <Typography variant="span">
-                {truncateMessage(user.email, 26)}
+                {truncateMessage(user?.email || "", 26)}
               </Typography>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <Button
+            {/* <Button
               variant="default"
               size="lg"
               className="w-full"
@@ -135,7 +140,23 @@ const NavbarDropdowns = ({ user }: { user: any }) => {
               }}
             >
               View Profile
-            </Button>
+            </Button> */}
+            <form
+              action={async () => 
+                await signOutHelper()
+              }
+              className="flex items-center justify-center gap-2 w-full"
+            >
+              <Button
+                variant="destructive"
+                size="lg"
+                type="submit"
+                className={`rounded-md p-3 text-white flex gap-2 items-center justify-center w-full`}
+              >
+                <PowerIcon className="w-6" />
+                <div className="">Sign Out</div>
+              </Button>
+            </form>
           </DropdownMenuContent>
         )}
       </DropdownMenu>

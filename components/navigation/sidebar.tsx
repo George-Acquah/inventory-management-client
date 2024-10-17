@@ -1,11 +1,12 @@
-"use client";
-
 import { DesktopSidebar, MobileSidebar } from "./sidebarTypes";
-import { Logo, LogoIcon } from "../ui/logo";
+import ResolvedLogo from "../ui/logo";
 import { sidebarLinks } from "@/data/sidebar.data";
 import { SidebarLink } from "./sidebarLinks";
-import Image from "next/image";
-import { useConfigurator } from "@/utils/contexts/configurator.context";
+import { Typography } from "../ui/typography";
+import React from "react";
+import { PowerIcon } from "@heroicons/react/24/outline";
+import { Button } from "../ui/button";
+import { signOut } from "@/auth";
 
 export const SidebarBody = (props: React.ComponentProps<'div'>) => {
   return (
@@ -17,33 +18,39 @@ export const SidebarBody = (props: React.ComponentProps<'div'>) => {
 };
 
 const Sidebar = () => {
-  const { state: { openSidenav } } = useConfigurator();
   return (
     <SidebarBody className="justify-between gap-10">
       <div className="flex flex-col overflow-x-hidden">
-        {openSidenav ? <Logo /> : <LogoIcon />}
+        <ResolvedLogo />
         <div className="mt-8 flex flex-col gap-2">
           {sidebarLinks.map((link, idx) => (
-            <SidebarLink key={idx} link={link} />
+            <React.Fragment key={idx}>
+              {link.parent && (
+                <Typography variant="h4">{link.parent}</Typography>
+              )}
+              <SidebarLink key={idx} link={link} />
+            </React.Fragment>
           ))}
         </div>
       </div>
       <div>
-        <SidebarLink
-          link={{
-            label: "ChaGeo",
-            href: "https://github.com/cha-geo",
-            icon: (
-              <Image
-                src="https://assets.aceternity.com/manu.png"
-                className="h-7 w-7 flex-shrink-0 rounded-full object-cover" // Ensure object-cover is applied
-                width={50}
-                height={50}
-                alt="Avatar"
-              />
-            ),
+        <form
+          action={async () => {
+            'use server';
+            await signOut();
           }}
-        />
+          className="flex items-center justify-center gap-2 w-full"
+        >
+          <Button
+            variant="destructive"
+            size="lg"
+            type="submit"
+            className={`rounded-md p-3 text-white flex gap-4 items-center justify-center w-[80%]`}
+          >
+            <PowerIcon className="w-6" />
+            <div className="">Sign Out</div>
+          </Button>
+        </form>
       </div>
     </SidebarBody>
   );

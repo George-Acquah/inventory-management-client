@@ -1,3 +1,16 @@
+import { ITEM_SEX_TYPE, ITEM_ZONE } from "@/schemas";
+import { formatKey } from "@/utils/root.utils";
+
+const zoneOptions = Object.entries(ITEM_ZONE).map(([key, value]) => ({
+  label: formatKey(key), // Use the enum key as the label
+  value: value, // Use the enum value as the value
+}));
+
+const sexTypeOptions = Object.entries(ITEM_SEX_TYPE).map(([key, value]) => ({
+  label: formatKey(key), // Use the enum key as the label
+  value: value, // Use the enum value as the value
+}));
+
 export const projectFields: _ICommonFieldProps[] = [
   // Group: Basic Information
   {
@@ -43,6 +56,53 @@ export const projectFields: _ICommonFieldProps[] = [
   },
 ];
 
+export const createItemFields: _ICommonFieldProps[] = [
+  {
+    name: "itemName",
+    label: "Item Name",
+    type: "text",
+    placeholder: "Enter item name",
+    group: "Basic Information",
+  },
+  {
+    name: "stock",
+    label: "Stock",
+    type: "number",
+    placeholder: "Enter available stock",
+    group: "Basic Information",
+  },
+  {
+    name: "price",
+    label: "Price",
+    type: "number",
+    placeholder: "Enter item price",
+    group: "Price Information",
+  },
+
+  {
+    name: "lastPrice",
+    label: "Last Price",
+    type: "number",
+    placeholder: "Enter last sold price",
+    group: "Price Information",
+  },
+  {
+    name: "zone",
+    label: "Zone",
+    type: "select",
+    options: zoneOptions,
+    group: "Category Information",
+    placeholder: "Select a zone",
+  },
+  {
+    name: "sexType",
+    label: "Sex Type",
+    type: "select",
+    options: sexTypeOptions,
+    group: "Category Information",
+    placeholder: "Select sex type",
+  },
+];
 
 export const teamFields: _ICommonFieldProps[] = [
   // Group: Basic Information

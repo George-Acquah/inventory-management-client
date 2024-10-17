@@ -1,6 +1,12 @@
-import React, { useReducer, useMemo, useContext } from "react";
+import React, {
+  useReducer,
+  useMemo,
+  useContext,
+  useEffect,
+  useCallback,
+} from "react";
+import useLocalStorage from "../hooks/useStorage";
 
-// Define the types for the state
 interface State {
   openSidenav: boolean;
   sidenavType: string;
@@ -11,7 +17,6 @@ interface State {
   openConfigurator: boolean;
 }
 
-// Define the action types
 type Action =
   | { type: "OPEN_SIDENAV"; value: boolean }
   | { type: "SIDENAV_TYPE"; value: string }
@@ -21,18 +26,16 @@ type Action =
   | { type: "FIXED_NAVBAR"; value: boolean }
   | { type: "OPEN_CONFIGURATOR"; value: boolean };
 
-// Define the initial state
 const initialState: State = {
-  openSidenav: false,
+  openSidenav: true,
   sidenavColor: "dark",
   sidenavType: "white",
   transparentNavbar: true,
-  animateSidenav: true,
+  animateSidenav: false,
   fixedNavbar: false,
   openConfigurator: false,
 };
 
-// Create the reducer function with typed state and actions
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "OPEN_SIDENAV":
@@ -54,21 +57,84 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-// Create the context with types
 interface _IConfiguratorContextType {
   state: State;
-  dispatch: React.Dispatch<Action>;
+  setOpenSidenav: (value: boolean) => void;
+  setSidenavType: (value: string) => void;
+  setAnimateSidenav: (value: boolean) => void;
+  setSidenavColor: (value: string) => void;
+  setTransparentNavbar: (value: boolean) => void;
+  setFixedNavbar: (value: boolean) => void;
+  setOpenConfigurator: (value: boolean) => void;
 }
 
 const ConfiguratorContext =
   React.createContext<_IConfiguratorContextType | null>(null);
 ConfiguratorContext.displayName = "ConfiguratorContext";
 
-// Create the provider component with types
 const ConfiguratorProvider: React.FC<_IChildren> = ({ children }) => {
+  // const [configurationData, setConfigurationData] = useLocalStorage<State>(
+  //   "configurationData",
+  //   initialState
+  // );
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
+  // useEffect(() => {
+  //   setConfigurationData(state);
+  // }, [state, setConfigurationData]);
+
+  const setOpenSidenav = useCallback(
+    (value: boolean) => dispatch({ type: "OPEN_SIDENAV", value }),
+    []
+  );
+  const setSidenavType = useCallback(
+    (value: string) => dispatch({ type: "SIDENAV_TYPE", value }),
+    []
+  );
+  const setAnimateSidenav = useCallback(
+    (value: boolean) => dispatch({ type: "ANIMATE_SIDENAV", value }),
+    []
+  );
+  const setSidenavColor = useCallback(
+    (value: string) => dispatch({ type: "SIDENAV_COLOR", value }),
+    []
+  );
+  const setTransparentNavbar = useCallback(
+    (value: boolean) => dispatch({ type: "TRANSPARENT_NAVBAR", value }),
+    []
+  );
+  const setFixedNavbar = useCallback(
+    (value: boolean) => dispatch({ type: "FIXED_NAVBAR", value }),
+    []
+  );
+  const setOpenConfigurator = useCallback(
+    (value: boolean) => dispatch({ type: "OPEN_CONFIGURATOR", value }),
+    []
+  );
+
+  const value = useMemo(
+    () => ({
+      state,
+      setOpenSidenav,
+      setSidenavType,
+      setAnimateSidenav,
+      setSidenavColor,
+      setTransparentNavbar,
+      setFixedNavbar,
+      setOpenConfigurator,
+    }),
+    [
+      state,
+      setOpenSidenav,
+      setSidenavType,
+      setAnimateSidenav,
+      setSidenavColor,
+      setTransparentNavbar,
+      setFixedNavbar,
+      setOpenConfigurator,
+    ]
+  );
 
   return (
     <ConfiguratorContext.Provider value={value}>
@@ -77,7 +143,6 @@ const ConfiguratorProvider: React.FC<_IChildren> = ({ children }) => {
   );
 };
 
-// Custom hook to use the Configurator context
 export const useConfigurator = (): _IConfiguratorContextType => {
   const context = useContext(ConfiguratorContext);
   if (!context) {
@@ -87,41 +152,5 @@ export const useConfigurator = (): _IConfiguratorContextType => {
   }
   return context;
 };
-
-// Action creators with types
-export const setOpenSidenav = (
-  dispatch: React.Dispatch<Action>,
-  value: boolean
-) => dispatch({ type: "OPEN_SIDENAV", value });
-
-export const setAnimateSidenav = (
-  dispatch: React.Dispatch<Action>,
-  value: boolean
-) => dispatch({ type: "ANIMATE_SIDENAV", value });
-
-export const setSidenavType = (
-  dispatch: React.Dispatch<Action>,
-  value: string
-) => dispatch({ type: "SIDENAV_TYPE", value });
-
-export const setSidenavColor = (
-  dispatch: React.Dispatch<Action>,
-  value: string
-) => dispatch({ type: "SIDENAV_COLOR", value });
-
-export const setTransparentNavbar = (
-  dispatch: React.Dispatch<Action>,
-  value: boolean
-) => dispatch({ type: "TRANSPARENT_NAVBAR", value });
-
-export const setFixedNavbar = (
-  dispatch: React.Dispatch<Action>,
-  value: boolean
-) => dispatch({ type: "FIXED_NAVBAR", value });
-
-export const setOpenConfigurator = (
-  dispatch: React.Dispatch<Action>,
-  value: boolean
-) => dispatch({ type: "OPEN_CONFIGURATOR", value });
 
 export default ConfiguratorProvider;

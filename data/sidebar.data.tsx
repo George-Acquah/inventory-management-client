@@ -1,4 +1,4 @@
-import { ArrowLeftEndOnRectangleIcon, BriefcaseIcon, ClipboardDocumentIcon, CodeBracketIcon, Cog8ToothIcon, UserIcon, UsersIcon  } from "@heroicons/react/24/outline"
+import { BriefcaseIcon, CodeBracketIcon,  UsersIcon  } from "@heroicons/react/24/outline"
 
 export const sidebarLinks: _ILinks[] = [
   {
@@ -9,47 +9,20 @@ export const sidebarLinks: _ILinks[] = [
     ),
   },
   {
-    label: "Projects",
-    href: "/dashboard/projects",
+    label: "Inventory",
+    href: "/dashboard/inventory",
+    parent: 'Tables',
     icon: (
       <BriefcaseIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
   },
   {
-    label: "Teams",
-    href: "/dashboard/teams",
+    label: "Transactions",
+    href: "/dashboard/transactions",
     icon: (
       <UsersIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
     ),
-  },
-  {
-    label: "Tasks",
-    href: "/dashboard/tasks",
-    icon: (
-      <ClipboardDocumentIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-  {
-    label: "Clients",
-    href: "/dashboard/clients",
-    icon: (
-      <UserIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: (
-      <Cog8ToothIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
-  {
-    label: "Logout",
-    href: "/logout",
-    icon: (
-      <ArrowLeftEndOnRectangleIcon className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
-    ),
-  },
+  }
 ];
 
 export const notificationsData: _INotification[] = [

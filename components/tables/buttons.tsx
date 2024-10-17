@@ -25,12 +25,13 @@ export function EditBtn({
   );
 }
 
-export function DeleteBtn({ id, label, action, path }: _IActionBtn) {
-  const deleteAction = action.bind(null, id, path ?? "");
+export function DeleteBtn({ id, label, action, className, table }: _IActionBtn & { className?: string, table?: boolean}) {
+  const deleteAction = action.bind(null, id);
+  console.log(deleteAction)
 
   return (
-    <form action={deleteAction}>
-      <DeleteClientBtn label={label} />
+    <form action={deleteAction} className={cn('', className)}>
+      <DeleteClientBtn label={label} table={ table } />
     </form>
   );
 }

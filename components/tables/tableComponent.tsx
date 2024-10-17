@@ -11,29 +11,35 @@ import {
   TableCheckbox,
 } from "@/components/ui/table"; // Import custom encapsulated components
 import { usePathname } from "next/navigation";
-import { DeleteBtn, EditBtn } from "./buttons";
+import { EditBtn } from "./buttons";
 import StatusBadge from "./status";
 import NoContent from "../ui/noContent";
 import { Typography } from "../ui/typography";
-import { getStringValue, getTableBooleanFields } from "@/utils/root.utils";
+import { getTableBooleanFields } from "@/utils/root.utils";
 import { cn } from "@/utils/classes.utils";
 import {
   AdjustmentsHorizontalIcon,
   ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 import FormModal from "./tableModal";
-import { ProjectsFormInputSchema, TeamsSchema } from "@/schemas";
+import {
+  CreateItemSchema,
+  ProjectsFormInputSchema,
+  TeamsSchema,
+} from "@/schemas";
 import { ZodSchema } from "zod";
+import { API } from "@/lib/dataFetching";
 type SpecialFieldProps = {
   specialColumns: [string, string] | [string, string, string]; // Allow 2 or 3 fields
   specialFieldHeader: string; // Header for the special fields
+  customRoute?: string;
 };
 
 // Define schema mapping
 const schemaMap: { [key: string]: ZodSchema<any> } = {
   team: TeamsSchema,
   project: ProjectsFormInputSchema,
-  // Add other schemas here as needed
+  item: CreateItemSchema,
 };
 
 // Reusable component for rendering the image cell
@@ -56,20 +62,36 @@ const TableImage = React.memo(
 );
 TableImage.displayName = "TableImage";
 
-// Specialized rendering for when exactly 2 or 3 special fields are passed
 const renderSpecialFields = (item: _TableRowType, specialColumns: string[]) => {
+  const imageColumns = specialColumns.filter((col) =>
+    col.toLowerCase().includes("image")
+  );
+
   return (
     <>
-      {specialColumns.includes("image") && item.image && (
-        <TableImage
-          src={item.image ?? ""}
-          desc={getStringValue(item[specialColumns[1]]!)}
-        />
-      )}
+      {imageColumns.length > 0 &&
+        (() => {
+          const value = item[imageColumns[0]]; // Get the value for the first image column
+          let imageSrc: string | undefined;
 
+          if (Array.isArray(value)) {
+            imageSrc = value.length > 0 ? value[0] : undefined;
+          } else if (typeof value === "string") {
+            imageSrc = value;
+          }
+
+          return (
+            <TableImage
+              key={imageColumns[0]} // Use the column name as a key
+              src={imageSrc ? `${API}/image/${imageSrc}` : "/No+Image.png"}
+              desc={item.description ?? ""}
+            />
+          );
+        })() // Immediately invoke the function to return the JSX
+      }
       <div className="flex flex-col">
         {specialColumns
-          .filter((col) => col !== "image")
+          .filter((col) => !imageColumns.includes(col)) // Exclude image columns
           .map((field, index) => (
             <Typography
               key={index}
@@ -88,30 +110,41 @@ const renderSpecialFields = (item: _TableRowType, specialColumns: string[]) => {
   );
 };
 
-// Render other cell content based on the column type
 const renderCell = (column: string, item: _TableRowType) => {
   const value = item[column];
+  const hasImage = column.toLowerCase().includes("image");
 
-  // Handle array of strings
-  if (Array.isArray(value) && value.every((v) => typeof v === "string")) {
+  if (hasImage) {
+    let imageSrc: string | undefined;
+
+    if (Array.isArray(value)) {
+      imageSrc = value.length > 0 ? value[0] : undefined;
+    } else if (typeof value === "string") {
+      imageSrc = value;
+    } else {
+      imageSrc = undefined;
+    }
+    return (
+      <TableImage
+        src={imageSrc ? `${API}/image/${imageSrc}` : "/No+Image.png"}
+        desc={item.description ?? ""}
+      />
+    );
+  } else if (
+    Array.isArray(value) &&
+    value.every((v) => typeof v === "string")
+  ) {
     return (
       <Typography variant="span" className="text-base font-mono">
-        {value.join(", ")} {/* Join array of strings with comma */}
+        {value.join(", ")}
       </Typography>
     );
-  }
-
-  switch (column) {
-    case "image":
-      return (
-        <TableImage src={item.image ?? ""} desc={item.description ?? ""} />
-      );
-    default:
-      return (
-        <Typography variant="span" className="text-base font-mono">
-          {value ?? "N/A"}
-        </Typography>
-      );
+  } else {
+    return (
+      <Typography variant="span" className="text-base font-mono">
+        {value ?? "N/A"}
+      </Typography>
+    );
   }
 };
 
@@ -119,22 +152,41 @@ const renderCell = (column: string, item: _TableRowType) => {
 const TableButtonHelper = React.memo(
   ({
     id,
-    // entityType,
+    entityType,
     deleteAction,
+    customRoute,
+    data,
+    schema,
   }: {
     id: string;
     entityType: string;
+    customRoute?: string;
+    data?: any;
+    schema?: any;
     deleteAction?: (
-      id: string,
-      path: string
+      id: string
     ) => Promise<_IApiResponse<void> | undefined | void>;
   }) => {
-    const pathname = usePathname();
+    const pathname = customRoute ? `/${customRoute}` : usePathname();
     return (
       <div className="flex items-center gap-2">
         <EditBtn href={`${pathname}/${id}`} />
+        <FormModal
+          entityType={entityType}
+          type={"update"}
+          data={data}
+          id={id}
+          schema={schema}
+        />
         {deleteAction && (
-          <DeleteBtn id={id} label={"Delete"} action={deleteAction} />
+          <FormModal
+            entityType={entityType}
+            type={"delete"}
+            deleteAction={deleteAction}
+            data={undefined}
+            id={id}
+            schema={undefined}
+          />
         )}
       </div>
     );
@@ -149,12 +201,12 @@ const TableComponent = ({
   entityType,
   deleteAction,
   specialColumns,
-  specialFieldHeader = "Info", // Default header for special fields
+  specialFieldHeader = "Info",
+  customRoute,
 }: _ITableProps & Partial<SpecialFieldProps>) => {
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(
     new Set()
   );
-
   const renderSpecialFieldsHeader =
     specialColumns &&
     specialColumns?.length >= 2 &&
@@ -195,16 +247,9 @@ const TableComponent = ({
 
   const resolvedClassName = (extraClass?: string) =>
     cn(
-      `px-6 ${
-        renderSpecialFieldsHeader &&
-        specialColumns &&
-        specialColumns.includes("image")
-          ? "py-2"
-          : " py-4"
-      }`,
+      `px-6 ${renderSpecialFieldsHeader && specialColumns ? "py-2" : " py-4"}`,
       extraClass
     );
-
   // Retrieve the appropriate schema based on entityType
   const formSchema = schemaMap[entityType];
 
@@ -222,7 +267,6 @@ const TableComponent = ({
           <button className="w-8 h-8 flex items-center justify-center rounded-full text-primary-foreground bg-neutral-400 dark:bg-zinc-500">
             <ChevronUpDownIcon className="w-6 h-6" />
           </button>
-          {/* <FormModal table="teacher" type="create" /> */}
           <FormModal
             entityType={entityType}
             type={"create"}
@@ -301,14 +345,19 @@ const TableComponent = ({
                     </TableCell>
                   ))}
 
-                  <TableCell className={resolvedClassName("flex justify-end items-center")}>
-                    {item["role"] !== "admin" && (
-                      <TableButtonHelper
-                        id={item._id}
-                        entityType={entityType}
-                        deleteAction={deleteAction}
-                      />
+                  <TableCell
+                    className={resolvedClassName(
+                      "flex justify-center items-center"
                     )}
+                  >
+                    <TableButtonHelper
+                      id={item._id}
+                      entityType={entityType}
+                      deleteAction={deleteAction}
+                      customRoute={customRoute}
+                      schema={formSchema}
+                      data={item}
+                    />
                   </TableCell>
                 </TableRow>
               );

@@ -38,22 +38,28 @@ export const ModalBody = ({
   modalKey,
   className,
   intercepted = false,
+  closeModal: parentCloseModal
 }: {
     children: ReactNode;
     modalKey: string;
     className?: string;
-  intercepted?: boolean;
+    intercepted?: boolean;
+  closeModal?: () => void,
 }) => {
   const { isOpen, setOpen } = useModal();
   const modalRef = useRef(null);
   const router = useRouter();
 
-  const closeModal = useCallback(() => {
+  // Internal closeModal function if parent doesn't provide one
+  const internalCloseModal = useCallback(() => {
     setOpen(modalKey, false); // Close the modal with the given key
     if (intercepted) {
-      router.back();
+      router.back(); // Navigate back if intercepted
     }
   }, [intercepted, modalKey, router, setOpen]);
+
+  // Use parent's closeModal if provided, otherwise fallback to internalCloseModal
+  const closeModal = parentCloseModal || internalCloseModal;
 
   useOutsideClick(modalRef, closeModal);
 

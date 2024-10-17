@@ -125,7 +125,7 @@ const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
           "px-2 sm:px-4 md:px-6 text-sm", // Use smaller padding on small screens
           isHeader
             ? "text-left text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider"
-            : "border-b border-gray-200 dark:border-zinc-900",
+            : "",
           className
         )}
         {...props}

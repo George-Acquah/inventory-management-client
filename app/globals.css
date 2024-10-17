@@ -33,6 +33,14 @@
   display: none; /* No horizontal scrollbar thumb */
 }
 
+/* Toast.css */
+.toast__container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it is above other content */
+}
+
 .react-calendar {
   width: 100% !important;
   border: none !important;

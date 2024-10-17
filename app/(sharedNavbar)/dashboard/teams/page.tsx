@@ -38,7 +38,6 @@ console.log(rowsToRender);
       </Suspense>
 
       <div className="w-full max-w-full overflow-hidden">
-        {/* Prevent overflow */}
         <Pagination totalPages={totalPages} />
       </div>
     </div>

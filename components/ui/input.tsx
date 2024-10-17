@@ -7,7 +7,7 @@ type InputProps =
       type: "text" | "email" | "password" | "number" | "radio";
       placeholder?: string;
     }
-  | { type: "select"; options?: { value: string; label: string }[] } // Make options optional
+  | { type: "select"; options?: { value: string | number; label: string }[] } // Make options optional
   | { type: "textarea"; placeholder?: string };
 interface CommonProps {
   className?: string;
@@ -23,9 +23,8 @@ const Input = React.forwardRef<
 
   const renderSelect = () => {
     const { options } = props as {
-      options: { value: string; label: string }[];
+      options: { value: string | number; label: string }[];
     };
-
     return (
       <select
         id={formItemId}

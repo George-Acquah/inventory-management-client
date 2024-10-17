@@ -1,5 +1,16 @@
 import * as z from "zod";
 
+export enum ITEM_ZONE {
+  ZONE_1 = "zone 1",
+  ZONE_2 = "zone 2",
+  ZONE_3 = "zone 3",
+}
+
+export enum ITEM_SEX_TYPE {
+  UNISEX = "unisex",
+  BISEX = "bisex",
+}
+
 export const LoginSchema = z.object({
   email: z
     .string()
@@ -69,3 +80,26 @@ export const ProjectsFormInputSchema = z.object({
 
 // Type inference from the schema
 export type ProjectsFormInput = z.infer<typeof ProjectsFormInputSchema>;
+
+export const CreateItemSchema = z
+  .object({
+    itemName: z.string().min(1, "Item name is required"),
+    stock: z.coerce.number().positive("Stock must be a positive number"),
+    price: z.coerce.number().positive("Price must be a positive number"),
+    lastPrice: z.coerce
+      .number()
+      .positive("Last price must be a positive number"),
+    zone: z.nativeEnum(ITEM_ZONE, {
+      errorMap: () => ({ message: "Invalid zone" }),
+    }),
+    sexType: z.nativeEnum(ITEM_SEX_TYPE, {
+      errorMap: () => ({ message: "Invalid sex type" }),
+    }),
+  })
+  .refine((data) => data.lastPrice <= data.price, {
+    message: "Last price must be less than price",
+    path: ["lastPrice"],
+  });
+
+// Type for frontend validation (optional but useful)
+export type CreateItemSchemaType = z.infer<typeof CreateItemSchema>;

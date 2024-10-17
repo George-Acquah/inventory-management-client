@@ -1,7 +1,6 @@
 'use client'
 import React, { useRef } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { setAnimateSidenav, setOpenConfigurator, setOpenSidenav, setSidenavColor, setSidenavType, useConfigurator } from "@/utils/contexts/configurator.context";
 import { Typography } from "./ui/typography";
 import { Button } from "./ui/button";
 import { AnimatedTooltip } from "./ui/tooltip";
@@ -10,18 +9,19 @@ import { Switch } from "./ui/switch";
 import { GitHubIcon } from "./ui/icons";
 import { useOutsideClick } from "@/utils/hooks/useOutsideClick";
 import { formatNumber } from "@/utils/root.utils";
+import { useConfigurator } from "@/utils/contexts/configurator.context";
 
 interface _Indexer {
   [key: string]: string;
 }
 
 function Configurator() {
-  const { dispatch, state } = useConfigurator();
+  const { state, setOpenConfigurator, setSidenavColor, setSidenavType, setAnimateSidenav, setOpenSidenav } = useConfigurator();
   const { openConfigurator, sidenavColor, sidenavType, animateSidenav, openSidenav } =
     state;
   const [stars, setStars] = React.useState('0');
   const configuratorRef = useRef(null);
-  useOutsideClick(configuratorRef, () => setOpenConfigurator(dispatch, false));
+  useOutsideClick(configuratorRef, () => setOpenConfigurator(false));
 
   const sidenavColors: _Indexer = {
     white: "from-gray-100 to-gray-100 border-gray-200",
@@ -56,7 +56,7 @@ function Configurator() {
             size="icon"
             aria-label="Close Configurator"
             className="bg-transparent dark:bg-transparent shadow-none hover:bg-neutral-100 dark:hover:bg-neutral-700 rounded-full"
-            onClick={() => setOpenConfigurator(dispatch, false)}
+            onClick={() => setOpenConfigurator(false)}
           >
             <XMarkIcon
               strokeWidth={2.5}
@@ -79,7 +79,7 @@ function Configurator() {
                       ? "border-black"
                       : "border-transparent"
                   }`}
-                  onClick={() => setSidenavColor(dispatch, color)}
+                  onClick={() => setSidenavColor(color)}
                 />
               ))}
             </div>
@@ -93,14 +93,14 @@ function Configurator() {
               <Button
                 variant={sidenavType === "dark" ? "default" : "outline"}
                 aria-label="Dark Navbar"
-                onClick={() => setSidenavType(dispatch, "dark")}
+                onClick={() => setSidenavType("dark")}
                 size="default"
               >
                 Dark
               </Button>
               <Button
                 variant={sidenavType === "transparent" ? "default" : "outline"}
-                onClick={() => setSidenavType(dispatch, "transparent")}
+                onClick={() => setSidenavType("transparent")}
                 size="default"
                 aria-label="Transparent Navbar"
               >
@@ -108,7 +108,7 @@ function Configurator() {
               </Button>
               <Button
                 variant={sidenavType === "white" ? "default" : "outline"}
-                onClick={() => setSidenavType(dispatch, "white")}
+                onClick={() => setSidenavType("white")}
                 size="default"
                 aria-label="White Navbar"
               >
@@ -136,8 +136,8 @@ function Configurator() {
                 }`}
                 checked={!animateSidenav && openSidenav}
                 onSwitchToggle={() => {
-                  setAnimateSidenav(dispatch, false);
-                  setOpenSidenav(dispatch, true);
+                  setAnimateSidenav(false);
+                  setOpenSidenav(true);
                 }}
               />
             </div>
@@ -153,8 +153,8 @@ function Configurator() {
                 }`}
                 checked={!animateSidenav && !openSidenav}
                 onSwitchToggle={() => {
-                  setAnimateSidenav(dispatch, false);
-                  setOpenSidenav(dispatch, false);
+                  setAnimateSidenav(false);
+                  setOpenSidenav(false);
                 }}
               />
             </div>
@@ -168,8 +168,8 @@ function Configurator() {
                   animateSidenav ? "" : "hover:bg-secondary hover:bg-opacity-20"
                 }`}
                 onSwitchToggle={() => {
-                  setAnimateSidenav(dispatch, true);
-                  setOpenSidenav(dispatch, false);
+                  setAnimateSidenav(true);
+                  setOpenSidenav(false);
                 }}
               />
             </div>
