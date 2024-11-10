@@ -171,7 +171,7 @@ const FormModal = <TSchema extends ZodType<any, any>>({
         modalKey={`${String(entityType)}-${type}-${id}`}
         className={cn(
           `${
-            trigger ? "" :`${bgColor} ${size}`
+            trigger ? "" : `${bgColor} ${size}`
           }  p-2 flex items-center justify-center rounded-full`,
           className
         )}
@@ -180,7 +180,9 @@ const FormModal = <TSchema extends ZodType<any, any>>({
       </ModalTrigger>
       <ModalBody
         modalKey={`${String(entityType)}-${type}-${id}`}
-        className={`${type === "delete" ? "md:min-h-[20%] h-10rem" : ""}`}
+        className={`md:max-w-[50%] 2xl:max-w-[40%] ${
+          type === "delete" ? "md:min-h-[20%] h-10rem" : ""
+        }`}
       >
         <ModalContent className="md:px-1">{renderForm()}</ModalContent>
       </ModalBody>

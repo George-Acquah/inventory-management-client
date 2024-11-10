@@ -6,7 +6,7 @@ import { SEARCH_PARAMS } from "@/utils/constants/search.constants";
 import { PlaceholdersAndVanishInput } from "./ui/vanishInputs";
 
 interface IProps<T> {
-  entityType: T; // Add entityType prop
+  entityType: T;
   placeholders?: string[];
   disabled?: boolean;
 }

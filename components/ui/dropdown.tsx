@@ -66,7 +66,9 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
 
   return (
     <div ref={dropdownMenuRef} className="relative inline-block text-left">
-      <div onClick={() => setOpen((prev) => !prev)}>{trigger}</div>
+      <div onClick={() => {
+        setOpen((prev) => !prev);
+      }}>{trigger}</div>
 
       {open && (
         <div
@@ -115,7 +117,7 @@ export const DropdownMenuItem = forwardRef<HTMLDivElement, DropdownItemProps>(
     <div
       ref={ref}
       className={cn(
-        "flex cursor-pointer items-center rounded-md px-4 py-2 text-sm transition-transform duration-150 hover:bg-gray-100 active:scale-95",
+        "flex cursor-pointer items-center rounded-md px-4 py-2 text-sm transition-transform duration-150 hover:bg-gray-100 dark:hover:bg-zinc-900 active:scale-95",
         inset && "pl-8",
         className
       )}

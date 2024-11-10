@@ -1,8 +1,6 @@
 import React from "react";
 import TableComponent from "./tableComponent";
-import { projectsData } from "@/data/dummy.data";
-import { mockFetchData } from "@/lib/dataFetching";
-import { deleteEntity, deleteItem, fetchItems } from "@/lib/actions";
+import { deleteItem, fetchItems, fetchTransactions } from "@/lib/actions";
 
 export const InventoryTable = async ({
   query,
@@ -17,7 +15,6 @@ export const InventoryTable = async ({
     "zone",
     "sexType",
     "stock",
-    "addedById",
     "createdAt",
     "updatedAt",
   ];
@@ -45,19 +42,22 @@ export const TransactionsTable = async ({
   currentPage,
   pageSize,
 }: _ISpecificTableProps) => {
-  const projects = await mockFetchData(projectsData, {
-    query,
-    currentPage,
-    pageSize,
-  });
+  const transactions = await fetchTransactions(query, currentPage, pageSize);
 
-  const columns = ["title", "description", "teamMembers", "isActive"]; // Specify columns to display
+  const columns = [
+    "soldByName",
+    "itemNames",
+    "totalPrice",
+    "totalQuantity",
+    "createdAt",
+    "updatedAt",
+  ];
   return (
     <TableComponent
-      data={projects}
+      data={transactions}
       columnData={columns}
-      entityType="project"
-      deleteAction={deleteEntity}
+      entityType="transaction"
+      deleteAction={deleteItem}
     />
   );
 };

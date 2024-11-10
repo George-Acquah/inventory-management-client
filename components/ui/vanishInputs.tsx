@@ -1,5 +1,12 @@
 import { cn } from "@/utils/classes.utils";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { useEffect, useId, useState, useRef } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "./dropdown";
+import { getDropdownStyles } from "@/utils/root.utils";
+import useIsMobile from "@/utils/hooks/useMobileView";
+import { Typography } from "./typography";
+import { sexTypeOptions, zoneOptions } from "@/data/forms.data";
+import AppFilters from "../appFilters";
 
 interface _IVanishingInput {
   placeholders: string[];
@@ -21,6 +28,15 @@ export function PlaceholdersAndVanishInput({
 
   const searchId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isMobile = useIsMobile();
+  const filterStyles = getDropdownStyles(
+    "-10rem",
+    "100%",
+    "-8rem",
+    "2rem",
+    isMobile
+  );
 
   // Handle placeholder cycling every 3 seconds
   useEffect(() => {
@@ -50,7 +66,7 @@ export function PlaceholdersAndVanishInput({
   return (
     <div
       className={cn(
-        "w-full relative max-w-xl mx-auto bg-white dark:bg-zinc-800 h-12 rounded-full overflow-hidden shadow-md transition duration-200",
+        "w-full relative max-w-xl mx-auto bg-white dark:bg-zinc-800 h-12 rounded-full  shadow-md transition duration-200",
         value && "bg-gray-50"
       )}
     >
@@ -62,6 +78,7 @@ export function PlaceholdersAndVanishInput({
         id={searchId}
         ref={inputRef}
         value={value}
+        aria-label="search"
         type="text"
         disabled={disabled}
         onChange={(e) => {
@@ -71,11 +88,14 @@ export function PlaceholdersAndVanishInput({
           }
         }}
         className={cn(
-          "w-full text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black h-full rounded-full focus:outline-none focus:ring-0 pl-4 sm:pl-10 pr-20",
-          isPending && "text-opacity-30 dark:text-opacity-30" // Hide text when animating
+          "w-full text-sm sm:text-base z-50 border-none dark:text-white bg-transparent text-black h-full rounded-full focus:outline-none focus:ring-0 pl-4 sm:pl-12 pr-20",
+          isPending && "text-opacity-30 dark:text-opacity-30"
         )}
       />
 
+      <div className="absolute left-2 top-1/2 transform -translate-y-1/2 h-8 w-8 bg-transparent dark:transparent transition duration-200 flex items-center justify-center  border-r border-r-neutral-300 dark:border-neutral-600">
+        <AppFilters filterStyles={filterStyles}/>
+      </div>
       <button
         disabled={isPending || disabled}
         type="submit"

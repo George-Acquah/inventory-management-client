@@ -32,6 +32,22 @@ interface _IEntityData {
   type: string;
 }
 
+interface _ICountData {
+  name: string;
+  count: number;
+}
+
+interface _ITopSoldItems {
+  name: string;
+  itemsSold: number;
+  itemsInStore: number;
+}
+ interface _IAnalyticsData {
+  entityData: _IEntityData[];
+  countData: _ICountData[];
+  topSoldItems: _ITopSoldItems[];
+}
+
 interface _IPostApiResponse {
   statusCode: number;
   message: string;
@@ -165,6 +181,22 @@ interface _IItem {
   updatedAt: string;
 }
 
+interface _ITransaction {
+  [key: string]:
+    | string
+    | string[]
+    | number
+    | undefined;
+  _id: string;
+  soldByName: string;
+  soldById: string;
+  totalPrice: number;
+  itemNames: string[];
+  totalQuantity: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface _IBasketContextType {
   state: State;
   addToBasket: (value: _IItem) => void;
@@ -225,6 +257,7 @@ type _TEntityType =
   | "project"
   | "task"
   | "team"
+  | "transaction"
   | "item";
 
   type Action =

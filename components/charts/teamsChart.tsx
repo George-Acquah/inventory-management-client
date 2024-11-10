@@ -12,38 +12,29 @@ import {
 } from "recharts";
 import { Chart, ChartContent, ChartHeader } from "../ui/chart";
 import { useTheme } from "next-themes";
+import { addSpaceBeforeCapitalLetters, getKeysExcludingField, truncateMessage } from "@/utils/root.utils";
 
-// Sample team data
-const teamData = [
-  {
-    name: "Team Alpha",
-    completedProjects: 30,
-    totalMembers: 10,
-    averageCompletionTime: 5,
-  },
-  {
-    name: "Team Beta",
-    completedProjects: 20,
-    totalMembers: 12,
-    averageCompletionTime: 3,
-  },
-  {
-    name: "Team Gamma",
-    completedProjects: 25,
-    totalMembers: 8,
-    averageCompletionTime: 6,
-  },
+const lightThemeColors = ["#4CAF50", "#2196F3"];
+
+const darkThemeColors = [
+  "#64B5F6", // Green
+  "#81C784",
 ];
 
-const TeamBarChart = () => {
+const TeamBarChart = ({ data: teamData }: {data: _ITopSoldItems[]}) => {
   const { theme } = useTheme();
+  const colors = theme === "light" ? lightThemeColors : darkThemeColors;
+  const datakeys = getKeysExcludingField<_ITopSoldItems>(teamData, "name");
 
   return (
     <Chart>
       <ChartHeader headerTitle="Team Performance" headerElipses />
       <ChartContent className="h-full">
         <ResponsiveContainer width="100%" height={"90%"}>
-          <BarChart data={teamData} width={500} height={300} barSize={20}>
+          <BarChart data={teamData.map(data => {
+            return {
+              ...data, name: truncateMessage(data.name, 10)
+          } })} width={500} height={300} barSize={20}>
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
@@ -68,27 +59,16 @@ const TeamBarChart = () => {
               verticalAlign="top"
               wrapperStyle={{ paddingTop: "20px", paddingBottom: "40px" }}
             />
-            <Bar
-              dataKey="completedProjects"
-              fill={theme === "light" ? "#4CAF50" : "#81C784"}
-              name="Completed Projects"
-              legendType="rect"
-              radius={[10, 10, 0, 0]}
-            />
-            <Bar
-              dataKey="totalMembers"
-              fill={theme === "light" ? "#2196F3" : "#64B5F6"}
-              name="Total Members"
-              legendType="rect"
-              radius={[10, 10, 0, 0]}
-            />
-            <Bar
-              dataKey="averageCompletionTime"
-              fill={theme === "light" ? "#FF9800" : "#FFB74D"}
-              name="Avg Completion Time (days)"
-              legendType="rect"
-              radius={[10, 10, 0, 0]}
-            />
+            {datakeys.map((key, idx) => (
+              <Bar
+                key={key+idx}
+                dataKey={key}
+                fill={colors[idx]}
+                name={addSpaceBeforeCapitalLetters(key)}
+                legendType="rect"
+                radius={[10, 10, 0, 0]}
+              />
+            ))}
           </BarChart>
         </ResponsiveContainer>
       </ChartContent>

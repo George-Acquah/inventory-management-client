@@ -6,41 +6,52 @@ import { Chart, ChartContent, ChartFooter, ChartHeader } from "../ui/chart";
 import { useTheme } from "next-themes";
 import { calculatePercentage } from "@/utils/root.utils";
 
-// Updated data to reflect projects
-const data = (theme: string = "light") => [
-  {
-    name: "Total",
-    count: 300,
-    fill: theme === "light" ? "#f5f5f5" : "#262626",
-  },
-  {
-    name: "Completed",
-    count: 195, // Adjust this value as needed
-    fill: theme === "light" ? "hsl(150,60%,45%)" : "hsl(150,60%,55%)",
-  },
-  {
-    name: "In Progress",
-    count: 90, // Adjust this value as needed
-    fill: theme === "light" ? "hsl(45,100%,55%)" : "hsl(45, 100%, 45%)",
-  },
-  {
-    name: "Not Started",
-    count: 15, // Adjust this value as needed
-    fill: theme === "light" ? "hsl(30,70%,50%)" : "hsl(30,70%,60%)",
-  },
+const lightThemeColors = [
+  "hsl(150,60%,45%)", // Green
+  "#f5f5f5", // Light grey
+  "hsl(45,100%,55%)", // Yellow
+  "hsl(30,70%,50%)", // Orange
+  // Add more colors as needed
 ];
 
-const CountChart = () => {
+const darkThemeColors = [
+  "hsl(150,60%,55%)", // Green
+  "#262626", // Dark grey
+  "hsl(45,100%,45%)", // Yellow
+  "hsl(30,70%,60%)", // Orange
+];
+
+interface _IC extends _ICountData {
+  fill: string;
+}
+
+const applyColorsToCountData = (
+  countData: _ICountData[],
+  total: number,
+  theme: string = "light"
+):  _IC[] => {
+  const colors = theme === "light" ? lightThemeColors : darkThemeColors;
+
+  const newData = countData.map((item, index) => ({
+    ...item,
+    fill: colors[index % colors.length],
+  }));
+
+  return [...newData, { fill: 'gray', name: 'Total', count: total}];
+};
+
+
+const CountChart = ({ countData }: { countData: _ICountData[] }) => {
   const { theme } = useTheme();
 
   // Extracting data for easier access
-  const chartData = data(theme);
-  const total = chartData[0].count; // Total projects
+  const total = countData.reduce((acc, newItem) => acc + newItem.count, 0);
+  const chartData = applyColorsToCountData(countData, total);
 
   return (
     <Chart className="">
       {/* TITLE */}
-      <ChartHeader headerElipses headerTitle="Projects" />
+      <ChartHeader headerElipses headerTitle="Top Sellers" />
       {/* CHART */}
       <ChartContent>
         <ResponsiveContainer>
@@ -54,7 +65,7 @@ const CountChart = () => {
           >
             <RadialBar
               dataKey="count"
-              background={{ fill: theme === "dark" ? "#404040" : "#FFF" }} // Dark or light background
+              background={{ fill: theme === "dark" ? "#404040" : "#FFF" }}
             />
           </RadialBarChart>
         </ResponsiveContainer>
@@ -68,22 +79,26 @@ const CountChart = () => {
       </ChartContent>
       {/* BOTTOM */}
       <ChartFooter className="gap-5">
-        {chartData.slice(1).map((item) => (
-          <div key={item.name} className="flex flex-col">
-            <div
-              className="w-5 h-5 rounded-full"
-              style={{ backgroundColor: item.fill }}
-            />
-            <Typography variant="h1" className="text-lg">
-              {item.count}
-            </Typography>
-            <Typography
-              variant="h4"
-              className="text-xs text-neutral-400 dark:text-neutral-400"
-            >
-              {`${item.name} (${calculatePercentage(total, item.count)}%)`}
-            </Typography>
-          </div>
+        {chartData.map((item) => (
+          <>
+            {item.name === "Total" ? undefined : (
+              <div key={item.name} className="flex flex-col">
+                <div
+                  className="w-5 h-5 rounded-full"
+                  style={{ backgroundColor: item.fill }}
+                />
+                <Typography variant="h1" className="text-lg">
+                  {item.count}
+                </Typography>
+                <Typography
+                  variant="h4"
+                  className="text-xs text-neutral-400 dark:text-neutral-400"
+                >
+                  {`${item.name} (${calculatePercentage(total, item.count)}%)`}
+                </Typography>
+              </div>
+            )}
+          </>
         ))}
       </ChartFooter>
     </Chart>

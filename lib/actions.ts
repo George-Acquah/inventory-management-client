@@ -10,6 +10,7 @@ import {
   AUTH_ERRORS,
   redirectDynamicUrls,
 } from "@/utils/constants/errors.constants";
+import { AuthError } from "next-auth";
 
 export async function signOutHelper() {
   await signOut();
@@ -101,12 +102,14 @@ export const loginAction = async (prevState: any, payload: FormData) => {
     permanentRedirect("/inventory", RedirectType.replace);
   } catch (err: any) {
     if (err.message === "NEXT_REDIRECT") {
-      throw err; // Re-throw the redirect error
+      throw err;
+    } else if (err instanceof AuthError) {
+      console.log(err);
     } else {
       // Handle other errors here
       const errorUrl = AUTH_ERRORS.NEXTAUTH_ERROR_URL("auth");
       console.log(errorUrl);
-      redirect(errorUrl); // Redirect to a generic error page
+      redirect(errorUrl);
     }
   }
 };
@@ -221,6 +224,32 @@ export const fetchItems = async (q = "", currentPage = 1, size = 5) => {
     const url = `items?q=${q}&currentPage=${currentPage}&size=${size}`;
 
     const response = await fetcher<_IItem[], undefined>(url, "GET", "no-store");
+
+    return response.data;
+  } catch (error) {
+    const errorUrl = AUTH_ERRORS.NEXTAUTH_ERROR_URL("inventory");
+    redirect(errorUrl);
+  }
+};
+
+export const fetchAnalyticsData = async () => {
+  try {
+    const url = `transactions/analytics`;
+
+    const response = await fetcher<_IAnalyticsData, undefined>(url, "GET", "no-store");
+
+    return response.data;
+  } catch (error) {
+    const errorUrl = AUTH_ERRORS.NEXTAUTH_ERROR_URL("inventory");
+    redirect(errorUrl);
+  }
+};
+
+export const fetchTransactions = async (q = "", currentPage = 1, size = 5) => {
+  try {
+    const url = `transactions?q=${q}&currentPage=${currentPage}&size=${size}`;
+
+    const response = await fetcher<_ITransaction[], undefined>(url, "GET", "no-store");
 
     return response.data;
   } catch (error) {

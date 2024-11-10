@@ -65,9 +65,9 @@ export const DesktopSidebar = ({
   return (
     <div
       className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 transition-all duration-300", // Transition for smooth animation
+        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 transition-all duration-300",
         className,
-        openSidenav ? "w-60" : "w-15" // Adjust width based on openSidenav state
+        openSidenav ? "w-48" : "w-15"
       )}
       onMouseEnter={
         animateSidenav ? () => setOpenSidenav(true) : undefined

@@ -1,12 +1,12 @@
 import { ITEM_SEX_TYPE, ITEM_ZONE } from "@/schemas";
 import { formatKey } from "@/utils/root.utils";
 
-const zoneOptions = Object.entries(ITEM_ZONE).map(([key, value]) => ({
+export const zoneOptions = Object.entries(ITEM_ZONE).map(([key, value]) => ({
   label: formatKey(key), // Use the enum key as the label
   value: value, // Use the enum value as the value
 }));
 
-const sexTypeOptions = Object.entries(ITEM_SEX_TYPE).map(([key, value]) => ({
+export const sexTypeOptions = Object.entries(ITEM_SEX_TYPE).map(([key, value]) => ({
   label: formatKey(key), // Use the enum key as the label
   value: value, // Use the enum value as the value
 }));

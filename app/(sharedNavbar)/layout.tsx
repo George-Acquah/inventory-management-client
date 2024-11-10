@@ -13,10 +13,7 @@ const Sidebar = dynamic(() => import("@/components/navigation/sidebar"), {
 });
 
 const NavbarDropdowns = dynamic(
-  () => import("@/components/navigation/navbarDropdowns"),
-  {
-    loading: () => <Typography variant="span">Loading...</Typography>,
-  }
+  () => import("@/components/navigation/navbarDropdowns")
 );
 
 export default async function SharedNavbarLayout({ children }: _IChildren) {
@@ -40,8 +37,8 @@ export default async function SharedNavbarLayout({ children }: _IChildren) {
             <Search entityType="QUERY" />
             <NavbarDropdowns
               user={{
-                name: user?.name!,
-                email: user?.email!,
+                name: user?.name || undefined,
+                email: user?.email || undefined,
               }}
             />
           </div>

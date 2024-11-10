@@ -120,7 +120,11 @@ const FormMessage = React.forwardRef<HTMLParagraphElement, _TRefPElement>(
 FormMessage.displayName = "FormMessage";
 
 const FormError = ({ message }: { message: string }) => {
-  if (!message) return;
+  const { error } = useFormField();
+
+  if (!error) return;
+
+   if (!message) return;
 
   return (
     <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">

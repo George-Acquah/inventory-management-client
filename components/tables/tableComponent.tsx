@@ -9,16 +9,15 @@ import {
   TableImageCell,
   TableHeader,
   TableCheckbox,
-} from "@/components/ui/table"; // Import custom encapsulated components
+} from "@/components/ui/table";
 import { usePathname } from "next/navigation";
 import { EditBtn } from "./buttons";
 import StatusBadge from "./status";
 import NoContent from "../ui/noContent";
 import { Typography } from "../ui/typography";
-import { getTableBooleanFields } from "@/utils/root.utils";
+import { getDropdownStyles, getTableBooleanFields } from "@/utils/root.utils";
 import { cn } from "@/utils/classes.utils";
 import {
-  AdjustmentsHorizontalIcon,
   ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 import FormModal from "./tableModal";
@@ -29,9 +28,11 @@ import {
 } from "@/schemas";
 import { ZodSchema } from "zod";
 import { API } from "@/lib/dataFetching";
+import useIsMobile from "@/utils/hooks/useMobileView";
+import AppFilters from "../appFilters";
 type SpecialFieldProps = {
-  specialColumns: [string, string] | [string, string, string]; // Allow 2 or 3 fields
-  specialFieldHeader: string; // Header for the special fields
+  specialColumns: [string, string] | [string, string, string];
+  specialFieldHeader: string;
   customRoute?: string;
 };
 
@@ -42,7 +43,6 @@ const schemaMap: { [key: string]: ZodSchema<any> } = {
   item: CreateItemSchema,
 };
 
-// Reusable component for rendering the image cell
 const TableImage = React.memo(
   ({
     src,
@@ -148,7 +148,6 @@ const renderCell = (column: string, item: _TableRowType) => {
   }
 };
 
-// Button helper for edit and delete actions
 const TableButtonHelper = React.memo(
   ({
     id,
@@ -166,8 +165,9 @@ const TableButtonHelper = React.memo(
     deleteAction?: (
       id: string
     ) => Promise<_IApiResponse<void> | undefined | void>;
-  }) => {
-    const pathname = customRoute ? `/${customRoute}` : usePathname();
+    }) => {
+    const difPathname = usePathname();
+    const pathname = customRoute ? `/${customRoute}` : difPathname;
     return (
       <div className="flex items-center gap-2">
         <EditBtn href={`${pathname}/${id}`} />
@@ -194,7 +194,6 @@ const TableButtonHelper = React.memo(
 );
 TableButtonHelper.displayName = "TableButtonHelper";
 
-// Main table component with bulk selection
 const TableComponent = ({
   data,
   columnData,
@@ -207,6 +206,7 @@ const TableComponent = ({
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(
     new Set()
   );
+  const isMobile = useIsMobile();
   const renderSpecialFieldsHeader =
     specialColumns &&
     specialColumns?.length >= 2 &&
@@ -235,7 +235,6 @@ const TableComponent = ({
     });
   };
 
-  // Handle "Select All" checkbox
   const toggleSelectAll = () => {
     if (selectedRows.size === data.length) {
       setSelectedRows(new Set()); // Unselect all
@@ -250,8 +249,16 @@ const TableComponent = ({
       `px-6 ${renderSpecialFieldsHeader && specialColumns ? "py-2" : " py-4"}`,
       extraClass
     );
-  // Retrieve the appropriate schema based on entityType
   const formSchema = schemaMap[entityType];
+
+  
+    const filterStyles = getDropdownStyles(
+      "-10rem",
+      "100%",
+      "-8rem",
+      "1.5rem",
+      isMobile
+    );
 
   return (
     <>
@@ -262,7 +269,7 @@ const TableComponent = ({
         >{`${entityType}s Table`}</Typography>
         <div className="flex items-center gap-2 self-end">
           <button className="w-8 h-8 flex items-center justify-center rounded-full text-primary-foreground bg-neutral-400 dark:bg-zinc-500">
-            <AdjustmentsHorizontalIcon className="w-6 h-6" />
+            <AppFilters filterStyles={filterStyles} />
           </button>
           <button className="w-8 h-8 flex items-center justify-center rounded-full text-primary-foreground bg-neutral-400 dark:bg-zinc-500">
             <ChevronUpDownIcon className="w-6 h-6" />
@@ -307,7 +314,7 @@ const TableComponent = ({
           </TableHead>
           <TableBody>
             {data.map((item) => {
-              const booleanFields = getTableBooleanFields(item); // Identify boolean fields
+              const booleanFields = getTableBooleanFields(item);
               const isSelected = selectedRows.has(item._id);
 
               return (
@@ -323,7 +330,6 @@ const TableComponent = ({
                     />
                   </TableCell>
 
-                  {/* Render specialized fields if criteria are met */}
                   {renderSpecialFieldsHeader && (
                     <TableCell
                       className={resolvedClassName("flex items-center gap-4")}

@@ -164,3 +164,24 @@ export const extractImagesFromData = (data: Record<string, any>): string[] => {
   }
   return [];
 };
+
+
+export const getKeysExcludingField = <T extends object>(
+  array: T[],
+  trimField: keyof T
+): Array<Exclude<keyof T, typeof trimField>> => {
+  // Check if the array is not empty
+  if (array.length === 0) {
+    return []; // Return an empty array if the input array is empty
+  }
+
+  // Get keys from the first object and exclude the trimField
+  const keys = Object.keys(array[0]).filter((key) => key !== trimField);
+
+  return keys as Array<Exclude<keyof T, typeof trimField>>;
+};
+
+export function addSpaceBeforeCapitalLetters(input: string): string {
+  // Use regex to match uppercase letters and prepend them with a space
+  return input.replace(/([A-Z])/g, " $1").trim();
+}

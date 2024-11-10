@@ -3,17 +3,26 @@
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  ChevronDownIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Link from "next/link";
-import { generatePagination } from "@/utils/root.utils";
+import { generatePagination, getDropdownStyles } from "@/utils/root.utils";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Button } from "./button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./dropdown";
+import { Typography } from "./typography";
+import useIsMobile from "@/utils/hooks/useMobileView";
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams?.get("page")) || 1;
+  const pageSize = typeof searchParams?.get("size") === 'string' ? Number(searchParams?.get("size")) : 'select size';
 
   const createPageURL = (pageNumber: number | string) => {
     const params = new URLSearchParams(searchParams);
@@ -21,80 +30,88 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
     return `${pathname}?${params.toString()}`;
   };
 
+  const createSizeURL = (size: number | string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("size", size.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+
   const allPages = generatePagination(currentPage, totalPages);
 
   return (
-    <div className="w-full flex justify-center items-center md:justify-between overflow-hidden">
-      <Link
-        href={createPageURL(currentPage - 1)}
-        className="aria-disabled:pointer-events-none hidden md:block"
-        aria-label="Previous Link"
-        aria-disabled={currentPage <= 1}
-      >
-        <Button
-          variant="default"
-          size="default"
-          aria-label="Previous Page"
+    <div className="w-full flex justify-center gap-8 items-center">
+      <div className="flex justify-around items-center gap-8">
+        <Link
+          href={createPageURL(currentPage - 1)}
+          className="aria-disabled:pointer-events-none hidden md:block"
+          aria-label="Previous Link"
           aria-disabled={currentPage <= 1}
         >
-          Prev
-        </Button>
-      </Link>
+          <Button
+            variant="default"
+            size="default"
+            aria-label="Previous Page"
+            aria-disabled={currentPage <= 1}
+          >
+            Prev
+          </Button>
+        </Link>
 
-      {/* Prevent elements from overflowing */}
-      <div className="inline-flex whitespace-nowrap">
-        <PaginationArrow
-          direction="left"
-          href={createPageURL(currentPage - 1)}
-          isDisabled={currentPage <= 1}
-        />
+        {/* Prevent elements from overflowing */}
+        <div className="inline-flex whitespace-nowrap">
+          <PaginationArrow
+            direction="left"
+            href={createPageURL(currentPage - 1)}
+            isDisabled={currentPage <= 1}
+          />
 
-        <div className="flex -space-x-px">
-          {allPages.map((page, index) => {
-            let position: "first" | "last" | "single" | "middle" | undefined;
-            if (index === 0) position = "first";
-            if (index === allPages.length - 1) position = "last";
-            if (allPages.length === 1) position = "single";
-            if (page === "...") position = "middle";
+          <div className="flex -space-x-px">
+            {allPages.map((page, index) => {
+              let position: "first" | "last" | "single" | "middle" | undefined;
+              if (index === 0) position = "first";
+              if (index === allPages.length - 1) position = "last";
+              if (allPages.length === 1) position = "single";
+              if (page === "...") position = "middle";
 
-            return (
-              <PaginationNumber
-                key={`${page}-_${index}`}
-                href={createPageURL(page)}
-                page={page}
-                position={position}
-                isActive={currentPage === page}
-              />
-            );
-          })}
+              return (
+                <PaginationNumber
+                  key={`${page}-_${index}`}
+                  href={createPageURL(page)}
+                  page={page}
+                  position={position}
+                  isActive={currentPage === page}
+                />
+              );
+            })}
+          </div>
+
+          <PaginationArrow
+            direction="right"
+            href={createPageURL(currentPage + 1)}
+            isDisabled={currentPage >= totalPages}
+          />
         </div>
 
-        <PaginationArrow
-          direction="right"
+        <Link
           href={createPageURL(currentPage + 1)}
-          isDisabled={currentPage >= totalPages}
-        />
-      </div>
-
-      <Link
-        href={createPageURL(currentPage + 1)}
-        className="aria-disabled:pointer-events-none hidden md:block"
-        aria-label="Next Link"
-        aria-disabled={currentPage >= totalPages}
-      >
-        <Button
-          variant="default"
-          size="default"
-          aria-label="Next Page"
+          className="aria-disabled:pointer-events-none hidden md:block"
+          aria-label="Next Link"
           aria-disabled={currentPage >= totalPages}
         >
-          Next
-        </Button>
-      </Link>
+          <Button
+            variant="default"
+            size="default"
+            aria-label="Next Page"
+            aria-disabled={currentPage >= totalPages}
+          >
+            Next
+          </Button>
+        </Link>
+      </div>
+      <PaginationPageSize createSizeFn={createSizeURL} pageSize={pageSize} />
     </div>
   );
 }
-
 
 function PaginationNumber({
   page,
@@ -160,5 +177,53 @@ function PaginationArrow({
     <Link aria-label={direction} className={className} href={href}>
       {icon}
     </Link>
+  );
+}
+
+function PaginationPageSize({
+  createSizeFn,
+  pageSize
+}: {
+    createSizeFn: (size: number) => string;
+    pageSize: number | 'select size';
+}) {
+  const sizeArray = [5, 10, 15, 20, 25];
+  const isMobile = useIsMobile();
+  const filterStyles = getDropdownStyles(
+    "-10rem",
+    "100%",
+    "0rem",
+    "2rem",
+    isMobile
+  );
+  return (
+    <DropdownMenu
+      trigger={
+        <div className="border rounded-md border-neutral-400 dark:border-neutral-600 flex items-center gap-4 px-4 py-1 cursor-pointer">
+          <p>{pageSize}</p>
+          <ChevronDownIcon className="w-4 h-4" />
+        </div>
+      }
+      style={filterStyles}
+      className={`dark:bg-neutral-800 bg-white ${
+        typeof pageSize === "string" ? "w-36" : ""
+      } ring-1 ring-black rounded-md px-1`}
+    >
+      {(onClose) => (
+        <DropdownMenuContent>
+          {sizeArray.map((size, idx) => (
+            <Link href={createSizeFn(size)} key={`${size}-${idx}`}>
+              <DropdownMenuItem
+                onClick={() => {
+                  onClose();
+                }}
+              >
+                <Typography variant="span">{size}</Typography>
+              </DropdownMenuItem>
+            </Link>
+          ))}
+        </DropdownMenuContent>
+      )}
+    </DropdownMenu>
   );
 }

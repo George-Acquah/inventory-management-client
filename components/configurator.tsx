@@ -84,7 +84,7 @@ function Configurator() {
               ))}
             </div>
           </div>
-          <div className="mb-12">
+          {/* <div className="mb-12">
             <Typography variant="h4">Sidenav Types</Typography>
             <Typography variant="p" color="secondary">
               Choose between 3 different sidenav types.
@@ -115,7 +115,7 @@ function Configurator() {
                 White
               </Button>
             </div>
-          </div>
+          </div> */}
           <div className="mb-12">
             <div className="h-[1px] bg-neutral-200 dark:bg-neutral-600" />
             <Typography variant="h4" className="mt-4">

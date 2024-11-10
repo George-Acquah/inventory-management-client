@@ -13,7 +13,7 @@ function useLocalStorage<T>(key: string, initialValue: T) {
         return initialValue;
       }
     }
-    return initialValue; // SSR: Return initial value during server-side rendering
+    return initialValue;
   });
 
   useEffect(() => {

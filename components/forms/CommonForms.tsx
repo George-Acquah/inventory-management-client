@@ -179,14 +179,14 @@ export const DynamicForm = <T extends FieldValues, R>({
         className="w-full max-w-xl mx-auto py-2"
       >
         {showSuccess && state?.type === "success" && (
-          <FormSuccess message={state?.message!} />
+          <FormSuccess message={state?.message} />
         )}
         {formType === "single"
           ? renderSingleFields(fields)
           : renderGroupedFields()}
 
         {includeFiles && (
-          <div className="w-full max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
+          <div className="w-full max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg mt-4">
             <FileUpload onChange={handleFileUpload} initialUrls={imageUrls} />
           </div>
         )}
