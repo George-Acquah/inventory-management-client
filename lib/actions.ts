@@ -105,7 +105,6 @@ export const loginAction = async (prevState: any, payload: FormData) => {
     } else if (err instanceof AuthError) {
       console.log(err);
       const errorUrl = AUTH_ERRORS.NEXTAUTH_ERROR_URL("auth");
-      console.log(errorUrl);
       redirect(errorUrl);
     } else {
       // Handle other errors here
