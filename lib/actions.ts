@@ -83,7 +83,6 @@ export const loginAction = async (prevState: any, payload: FormData) => {
   const formData = Object.fromEntries(payload.entries());
 
   try {
-    console.log(payload);
     const validatedFields = LoginSchema.safeParse(formData);
 
     if (!validatedFields.success) {
