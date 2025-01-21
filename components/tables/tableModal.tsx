@@ -163,7 +163,7 @@ const FormModal = <TSchema extends ZodType<any, any>>({
     }
 
     return <h1>Invalid Action</h1>;
-  }, [entityType, type, data, id, form]);
+  }, [entityType, type, data, id, form, deleteAction, table]);
 
   return (
     <>

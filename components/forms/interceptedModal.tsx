@@ -7,7 +7,7 @@ export function InterceptedModal({ children }: { children: ReactNode }) {
   const { setOpen } = useModal();
   useEffect(() => {
     setOpen('login', true);
-  }, []);
+  }, [setOpen]);
   return (
     <ModalBody modalKey={"login"}  intercepted>
       <ModalContent>

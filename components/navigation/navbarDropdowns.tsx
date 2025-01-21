@@ -16,7 +16,7 @@ import { notificationsData } from "@/data/sidebar.data";
 import { getDropdownStyles, truncateMessage } from "@/utils/root.utils";
 import Avatar from "../ui/avatar";
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import useIsMobile from "@/utils/hooks/useMobileView";
 import { signOutHelper } from "@/lib/actions";
 
@@ -27,7 +27,7 @@ const NavbarDropdowns = ({ user }: {
 } }) => {
   const notificationsCount = 5;
   const digitCount = notificationsCount.toString().length;
-  const router = useRouter();
+  // const router = useRouter();
   const isMobile = useIsMobile();
   const notificationStyles = getDropdownStyles(
     "-10rem",
@@ -121,7 +121,7 @@ const NavbarDropdowns = ({ user }: {
         style={profileStyles}
         className="dark:bg-neutral-800 bg-white ring-1 ring-black w-56 rounded-md px-1"
       >
-        {(onClose) => (
+        {() => (
           <DropdownMenuContent>
             <DropdownMenuLabel className="">
               <Typography variant="h5">{user?.name}</Typography>

@@ -77,6 +77,7 @@ const Input = React.forwardRef<
         error
           ? "border-2 border-red-500 focus-visible:ring-red-500 dark:focus-visible:ring-red-500"
           : "focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600",
+          
         className
       )}
       ref={ref as React.Ref<HTMLInputElement>}

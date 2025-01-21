@@ -18,7 +18,7 @@ import { cn } from "@/utils/classes.utils";
 import { FileUpload } from "../fileUpload";
 import { useModal } from "@/utils/contexts/modal.context";
 
-interface DynamicFormProps<T extends FieldValues, R> {
+interface DynamicFormProps<T extends FieldValues> {
   fields: _ICommonFieldProps[]; // Define the fields as an array of common field props
   action: any;
   form: UseFormReturn<T>; // UseForm return type inferred for the form schema (T)
@@ -49,7 +49,7 @@ export const DynamicForm = <T extends FieldValues, R>({
   id,
   isModal,
   entity
-}: DynamicFormProps<T, R>) => {
+}: DynamicFormProps<T>) => {
   const initialState: _TActionResult<R> = {
     type: undefined,
     message: null,
@@ -66,9 +66,7 @@ export const DynamicForm = <T extends FieldValues, R>({
 
   const imageUrls = data ? extractImagesFromData(data) : [];
   
-  const [files, setFiles] = includeFiles
-    ? useState<File[]>([])
-    : [[], () => {}];
+  const [files, setFiles] = useState<File[]>(includeFiles ? [] : []);
 
   const handleFileUpload = useCallback(
     (newFiles: File[]) => {
@@ -81,7 +79,7 @@ export const DynamicForm = <T extends FieldValues, R>({
 
   const [showSuccess, setShowSuccess] = useState(false);
   const groupedFieldConfigs = groupFieldConfigs(fields);
-  const groupData = data ?? {};
+  // const groupData = data ?? {};
 
   const onSubmit = useCallback(
     async (formData: T) => {
@@ -101,7 +99,7 @@ export const DynamicForm = <T extends FieldValues, R>({
 
       await formAction(formDataObject);
     },
-    [formAction, files, includeFiles, entity, actionType]
+    [formAction, files, includeFiles]
   );
 
   useEffect(() => {
@@ -115,7 +113,7 @@ export const DynamicForm = <T extends FieldValues, R>({
       }, 3000);
       return () => clearTimeout(timer);
     }
-  }, [state]);
+  }, [state, actionType, entity, isModal, setOpen]);
 
   // Function to render single fields
   const renderSingleFields = useCallback(

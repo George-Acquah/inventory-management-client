@@ -1,11 +1,7 @@
 import { cn } from "@/utils/classes.utils";
-import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { useEffect, useId, useState, useRef } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "./dropdown";
 import { getDropdownStyles } from "@/utils/root.utils";
 import useIsMobile from "@/utils/hooks/useMobileView";
-import { Typography } from "./typography";
-import { sexTypeOptions, zoneOptions } from "@/data/forms.data";
 import AppFilters from "../appFilters";
 
 interface _IVanishingInput {

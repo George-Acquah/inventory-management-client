@@ -16,8 +16,8 @@ interface _Indexer {
 }
 
 function Configurator() {
-  const { state, setOpenConfigurator, setSidenavColor, setSidenavType, setAnimateSidenav, setOpenSidenav } = useConfigurator();
-  const { openConfigurator, sidenavColor, sidenavType, animateSidenav, openSidenav } =
+  const { state, setOpenConfigurator, setSidenavColor, setAnimateSidenav, setOpenSidenav } = useConfigurator();
+  const { openConfigurator, sidenavColor, animateSidenav, openSidenav } =
     state;
   const [stars, setStars] = React.useState('0');
   const configuratorRef = useRef(null);
