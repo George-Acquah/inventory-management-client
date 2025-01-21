@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       { hostname: "assets.aceternity.com" },
       { hostname: "images.unsplash.com" },
-      { hostname: "localhost" },
+      { hostname: "glad-lion-holy.ngrok-free.app" },
       { hostname: "images.pexels.com" },
     ],
   },
