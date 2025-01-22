@@ -43,7 +43,7 @@ export async function updateBulkEntity(ids: string[]): Promise<void> {
 export const sellItem = async (item: _ISellPayload, path: string) => {
   try {
     const url = `transactions`;
-    const response = await fetcher<unknown, _ISellPayload>(
+    const response = await fetcher<string, _ISellPayload>(
       url,
       "POST",
       "no-store",
@@ -52,10 +52,14 @@ export const sellItem = async (item: _ISellPayload, path: string) => {
     console.log(response);
     if (response && response.statusCode === 200) {
       revalidatePath(path);
-      return response.message;
+      redirect(`/transaction/${response.data}`);
+      // return response;
     }
   } catch (err: any) {
     console.log(err);
+    if (err.message === "NEXT_REDIRECT") {
+      throw err;
+    }
     const { ERROR_URL: errorUrl } = redirectDynamicUrls(
       path,
       "inventory",
@@ -265,4 +269,16 @@ export const fetchSingleItem = async (id: string) => {
   const response = await fetcher<_IItem, undefined>(url);
 
   return response.data;
+};
+
+export const fetchSingleTransaction = async (id: string) => {
+try {
+  const url = `transactions/${id}`;
+
+  const response = await fetcher<_ITransaction, undefined>(url);
+
+  return response.data;
+} catch (error) {
+  throw error;
+}
 };
