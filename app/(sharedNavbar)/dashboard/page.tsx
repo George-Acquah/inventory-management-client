@@ -9,6 +9,8 @@ const DashboardPage = () => {
     <div className="flex gap-4 flex-col md:flex-row">
       {/* Right */}
       <div className="w-full lg:w-2/3 flex flex-col gap-8">
+      {/* Buttons */}
+        
         {/* DashboardPage Cards */}
         <Suspense key={'analytics-data-key'} fallback={<p>loading ...</p>}>
           <Analytics />

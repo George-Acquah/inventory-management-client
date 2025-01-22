@@ -112,10 +112,11 @@ const SingleInventoryActions = ({ item }: { item: _IItem }) => {
       totalPrice: numericPrice,
     };
 
-    const message = await sellItem(itemToSell, pathname);
-    if (message) {
-      showToast(message, 10000, "success");
-    }
+    return await sellItem(itemToSell, pathname);
+    // const response = await sellItem(itemToSell, pathname);
+    // if (response?.statusCode === 200) {
+    //   showToast(response.message, 10000, "success");
+    // }
   };
 
   return (
