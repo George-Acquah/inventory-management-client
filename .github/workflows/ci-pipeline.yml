@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-and-pr:
-    runs-on: ubuntu-latest  # Use an Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout code
@@ -25,28 +25,29 @@ jobs:
 
       # Step 4: Build
       - name: Build project
-        id: build
         run: npm run build
 
-      # Step 5: Output build status
-      - name: Output build status
-        if: success()
-        run: echo "Build completed successfully!"
-
-      # Step 6: Create a Pull Request to Dev
+      # Step 5: Create a Pull Request to Dev
       - name: Create Pull Request to Dev
+        id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.ACTION_TOKEN }}
-          branch: dev  # Merge into dev instead of main
+          branch: dev  # Target branch
           commit-message: 'Auto-merge branch into dev'
           title: 'Automated PR: Merge branch into dev'
           body: |
             This PR was automatically created after the build passed.
           delete-branch: false
 
-      # Step 7: Enable Auto-Merge (Optional)
+      # Step 6: Enable Auto-Merge using GitHub GraphQL API
       - name: Enable Auto-Merge
-        uses: github/enable-auto-merge-action@v2
-        with:
-          github-token: ${{ secrets.ACTION_TOKEN }}
+        run: |
+          gh api graphql -f query='
+            mutation {
+              enablePullRequestAutoMerge(input: {pullRequestId: "${{ steps.create_pr.outputs.pull-request-id }}", mergeMethod: SQUASH}) {
+                clientMutationId
+              }
+            }'
+        env:
+          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
