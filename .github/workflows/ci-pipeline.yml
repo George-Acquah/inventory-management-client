@@ -1,8 +1,9 @@
-name: Dev to Main Automation
+name: Any Branch to Dev Automation
 on:
   push:
-    branches:
-      - dev  # Trigger workflow on push to the dev branch
+    branches-ignore:
+      - main  # Ignore pushes to main, trigger on all other branches
+
 jobs:
   build-and-pr:
     runs-on: ubuntu-latest  # Use an Ubuntu runner
@@ -12,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js (if you're using Node.js)
+      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -23,25 +24,25 @@ jobs:
         run: npm install
 
       # Step 4: Build
-      - name: Build project in dev branch
-        id: build  # Assign an ID to reference this step
+      - name: Build project
+        id: build
         run: npm run build
 
       # Step 5: Output build status
       - name: Output build status
-        if: success()  # Only run if the build was successful
+        if: success()
         run: echo "Build completed successfully!"
 
-      # Step 6: Create a Pull Request to Main
-      - name: Create Pull Request to Main
+      # Step 6: Create a Pull Request to Dev
+      - name: Create Pull Request to Dev
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.ACTION_TOKEN }}
-          branch: main  # Target branch
-          commit-message: 'Auto-merge dev into main'
-          title: 'Automated PR: Merge dev into main'
+          branch: dev  # Merge into dev instead of main
+          commit-message: 'Auto-merge branch into dev'
+          title: 'Automated PR: Merge branch into dev'
           body: |
-            This PR was automatically created after the build passed on the dev branch.
+            This PR was automatically created after the build passed.
           delete-branch: false
 
       # Step 7: Enable Auto-Merge (Optional)
