@@ -84,4 +84,4 @@ const TransactionPage = async ({ params: { id } }: _IPageId) => {
   );
 }
 
-export default TransactionPage
+export default TransactionPage;
