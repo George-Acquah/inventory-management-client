@@ -40,14 +40,20 @@ jobs:
             This PR was automatically created after the build passed.
           delete-branch: false
 
-      # Step 6: Enable Auto-Merge using GitHub GraphQL API
-      - name: Enable Auto-Merge
+       # Step 6: Get the PR Number
+      - name: Get PR Number
+        id: get_pr
         run: |
-          gh api graphql -f query='
-            mutation {
-              enablePullRequestAutoMerge(input: {pullRequestId: "${{ steps.create_pr.outputs.pull-request-id }}", mergeMethod: SQUASH}) {
-                clientMutationId
-              }
-            }'
+          PR_NUMBER=$(gh pr list --base dev --head $GITHUB_REF_NAME --state open --json number --jq '.[0].number')
+          echo "PR_NUMBER=$PR_NUMBER" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
+
+      # Step 7: Enable Auto-Merge
+      - name: Enable Auto-Merge
+        if: env.PR_NUMBER != ''
+        run: |
+          echo "Merging PR #$PR_NUMBER"
+          gh pr merge $PR_NUMBER --squash --auto
         env:
           GH_TOKEN: ${{ secrets.ACTION_TOKEN }}
