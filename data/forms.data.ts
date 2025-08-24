@@ -12,7 +12,6 @@ export const sexTypeOptions = Object.entries(ITEM_SEX_TYPE).map(([key, value]) =
 }));
 
 export const projectFields: _ICommonFieldProps[] = [
-  // Group: Basic Information
   {
     name: "projectName",
     label: "Project Name",
