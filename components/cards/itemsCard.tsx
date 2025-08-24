@@ -99,16 +99,20 @@ const handleSellItem = async () => {
     totalPrice: numericPrice,
   };
 
-  const message = await sellItem(itemToSell, pathname);
-  if (message) {
-    showToast(message, 10000, "success");
-  }
+  // const response = await sellItem(itemToSell, pathname);
+  // if (response?.statusCode === 200) {
+  //   showToast(response.message, 10000, "success");
+
+  //   // redirec
+  // }
+
+  return await sellItem(itemToSell, pathname);
 };
 
   return (
     <Card
       className={cn(
-        `rounded-md ${THEME.secBg} p-1 flex-1 min-w-[130px] space-y-0 border-none`,
+        `rounded-md ${THEME.secBg} p-1 flex-1 min-w-[100px] space-y-0 border-none`,
         className
       )}
     >

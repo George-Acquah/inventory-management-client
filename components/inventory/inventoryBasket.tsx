@@ -36,12 +36,13 @@ const handleSellItemsInBasket = async () => {
     totalPrice
   };
 
-  const message = await sellItem(itemToSell, pathname);
-  if (message) {
-    clearBasket()
-    showToast(message, 10000, "success");
-  }
-  return;
+  // const response = await sellItem(itemToSell, pathname);
+  // if (response?.statusCode === 200) {
+  //   showToast(response.message, 10000, "success");
+  // }
+  // return;
+
+  return await sellItem(itemToSell, pathname);
 };
 
   return (
